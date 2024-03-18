@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}" />
+    <title>Traffic Sign Classification</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+        <h1 class="title">Traffic Sign Classification</h1>
+        <form class="form-content" id="upload-form" enctype="multipart/form-data">
+          <label for="file-upload" class="upload-btn">Upload Image</label>
+          <input id="file-upload" type="file" name="file" accept="image/*" onchange="previewImage(event)" />
+          <input type="button" class="submit-btn" value="Predict" onclick="uploadImage()" />
+        </form>
+        <div id="image-preview" class="image-preview"></div>
+        <div class="result">
+          <h2>Result</h2>
+          <div class="result-item">
+            <strong>Name: <span id="result_name"></span></strong>
+          </div>
+          <div class="result-item">
+            <strong>Percent: <span id="result_percent"></span>%</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      function uploadImage() {
+        var fileInput = document.getElementById('file-upload');
+        var formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        // Send a POST request to the server to upload the image
+        fetch('http://localhost:8000/api/predict', {
+          method: 'POST',
+          body: formData,
+        })
+          .then((response) => response?.json())
+          .then((data) => {
+            // Display result
+            console.log(data);
+            document.getElementById('result_name').innerText = data?.result_name;
+            document.getElementById('result_percent').innerText = data?.result_percent;
+          })
+          .catch((error) => console.error('Error:', error));
+      }
+
+      // Function to preview image after upload
+      function previewImage(event) {
+        var input = event.target;
+        var reader = new FileReader();
+        reader.onload = function () {
+          var img = document.createElement('img');
+          img.src = reader.result;
+          img.className = 'preview-image';
+          var previewContainer = document.getElementById('image-preview');
+          previewContainer.innerHTML = ''; // Clear previous image
+          previewContainer.appendChild(img);
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    </script>
+  </body>
+</html>
