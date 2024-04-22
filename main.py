@@ -6,6 +6,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
+# from lib import Utils 
+from lib import traffic_predict_trained
+from PIL import Image
+import io
+import numpy as np
+
 app = FastAPI()
 
 # # Enable CORS (Cross-Origin Resource Sharing) to allow requests from frontend
@@ -30,10 +36,16 @@ async def read_form(request: Request):
 
 @app.post("/api/predict")
 async def predict(request: Request, file: UploadFile = File(...)):
-    # Perform prediction here with the uploaded file
-    # Replace the following lines with your prediction logic
-    result_percent = 85  # Example result percentage
-    result_name = "Stop Sign"  # Example result name
+    # result_percent = 85  
+    # result_name = "Stop Sign" 
+
+     # Convert the uploaded file to an image
+    image = Image.open(io.BytesIO(await file.read()))
+    image = np.array(image)
+
+    # Call the predict function from Utils
+    result_name, result_percent = traffic_predict_trained.utils_predict(image)
+
 
     prediction_result = {
         "result_name": result_name,
