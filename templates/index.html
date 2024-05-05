@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}" />
+    <link rel="shortcut icon" href="{{ url_for('static', path='logo.svg') }}" type="image/x-icon" />
     <title>Traffic Sign Classification</title>
   </head>
   <body>
@@ -17,21 +18,24 @@
         </form>
         <div id="image-preview" class="image-preview"></div>
         <div class="result">
-          <h2>Result</h2>
-          <div class="result-item">
-            <strong>Name: <span id="result_name"></span></strong>
-          </div>
-          <div class="result-item">
-            <strong>Percent: <span id="result_percent"></span>%</strong>
+          <div id="loading" style="display: none">Loading...</div>
+          <div id="result-contain" class="result-contain" style="display: none">
+            <h2>Result</h2>
+            <div class="image-preview"><img id="resultImage" class="result-item" src="" alt="Result image" /></div>
           </div>
         </div>
       </div>
     </div>
     <script>
+      // Function to upload image to the server
       function uploadImage() {
         var fileInput = document.getElementById('file-upload');
         var formData = new FormData();
         formData.append('file', fileInput.files[0]);
+
+        // Show loading element
+        document.getElementById('result-contain').style.display = 'none';
+        document.getElementById('loading').style.display = 'block';
 
         // Send a POST request to the server to upload the image
         fetch('http://localhost:8000/api/predict', {
@@ -41,9 +45,12 @@
           .then((response) => response?.json())
           .then((data) => {
             // Display result
+            // Hide loading element
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('result-contain').style.display = 'block';
+
             console.log(data);
-            document.getElementById('result_name').innerText = data?.result_name;
-            document.getElementById('result_percent').innerText = data?.result_percent;
+            document.getElementById('resultImage').src = data?.result_img_url;
           })
           .catch((error) => console.error('Error:', error));
       }

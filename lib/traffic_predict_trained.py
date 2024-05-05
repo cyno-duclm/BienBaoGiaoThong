@@ -86,29 +86,9 @@ score = accuracy_score(ypred, yval)
 
 print(f'Accuracy score: {score}')
 
-hello_image = os.path.join(
-    current_directory, 'lib', 'traffic_sign_detection', 'images', 'road0.png')
-print(hello_image)
-img = cv2.imread(hello_image)
-predict(clf, scaler, img, labelEncoder)
-
-
 def utils_predict(image):
-    # Preprocess the image and extract its features
-    hogFeature = preprocessImg(image)
-    imgFeatures = np.array([hogFeature])
-
-    # Normalize the features
-    normalizedFeatures = scaler.transform(imgFeatures)
-
-    # Use the classifier to predict the class of the image
-    decision = clf.predict_proba(normalizedFeatures)[0]
-
-    # Get the predicted class and its confidence score
-    predictId = np.argmax(decision)
-    confScore = decision[predictId]
-
-    # Convert the predicted class ID to its corresponding name
-    result_name = labelEncoder.inverse_transform([predictId])[0]
-
-    return result_name, confScore
+    result_image_name =  predict(clf, scaler, image, labelEncoder)
+    if result_image_name is not None:
+        return result_image_name
+    return 'default.png'
+    
